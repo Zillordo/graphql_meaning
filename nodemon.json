@@ -1,0 +1,7 @@
+{
+    "env": {
+        "MONGO_USER": "Allan_Konecny",
+        "MONGO_PASSWORD": "6FDunZSvkzarHq9L",
+        "MONGO_DB": "book-react"
+    }
+}
