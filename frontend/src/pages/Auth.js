@@ -14,6 +14,7 @@ class AuthPage extends Component {
         super(props);
         this.emailEl = React.createRef();
         this.passwordEl = React.createRef();
+        this.userName = React.createRef();
     };
 
     toggleHandeler = () =>{
@@ -26,6 +27,8 @@ class AuthPage extends Component {
         event.preventDefault();
         const email = this.emailEl.current.value;
         const password = this.passwordEl.current.value;
+        
+        
 
         if (email.trim().lenght === 0 || password.trim().lenght === 0) {
             return;
@@ -47,10 +50,11 @@ class AuthPage extends Component {
         }
 
         if (!this.state.isLogin) {
+            const userName = this.userName.current.value;
             requestBody = {
                 query: `
                 mutation {
-                    createUser(userInput: {email: "${email}", password: "${password}"}) {
+                    createUser(userInput: {email: "${email}", password: "${password}", userName: "${userName}"}) {
                         email
                         _id
                     }
@@ -77,7 +81,7 @@ class AuthPage extends Component {
         })
         .then(resData => {
             if (resData.data.login.token) {
-                this.context.login(resData.data.login.token, resData.data.login.userId, resData.data.login.tokenExpiration)
+                this.context.login(resData.data.login.token, resData.data.login.userId, resData.data.login.tokenExpiration);
             }
         })
         .catch(err => console.log(err))
@@ -88,6 +92,12 @@ class AuthPage extends Component {
         return (
             <div className="form__login">
                 <form className="auth-form" onSubmit={this.submitHandeler}>
+                    {!this.state.isLogin && 
+                    <div className="form-control">
+                        <label htmlFor="userName">user name:</label>
+                        <input type="userName" className="password-input" id="userName" ref={this.userName}></input>
+                    </div>
+                    }
                     <div className="form-control">
                         <label htmlFor="email">e-mail:</label>
                         <input type="email" className="email-input" id="email" ref={this.emailEl}></input>

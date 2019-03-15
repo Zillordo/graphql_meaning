@@ -1,5 +1,7 @@
-import React, {  useState, useEffect, useContext } from 'react';
-import AuthContext from '../context/auth-context';
+import React, {  useState, useEffect, useContext, createContext } from 'react';
+
+import authContext from '../context/auth-context';
+import { NavLink } from 'react-router-dom';
 
 
 
@@ -14,10 +16,9 @@ function fetchData(dataType){
                 books {
                     _id
                     title
-                    author
+                    question
                     creator {
                         _id
-                        email
                     }
                 }
             }
@@ -90,48 +91,89 @@ function fetchData(dataType){
     
 }
 
-function RenderComents({bookId}){
-    const coments = fetchData("coments");
+const DataComents = createContext();
+const DataBooks = createContext();
 
-    return coments.map(coment =>{
-        if (coment.bookId._id === bookId) {
-            return <p key={coment._id}>{coment.coment}</p>;
-        }
-        return null;
-    })
-}
-
+//#region Functions for Books of user
 function RenderBooks(){
-    const context = useContext(AuthContext);
-    const books = fetchData("books");
+    const context = useContext(authContext);
+    const books = useContext(DataBooks);
 
     return books.map(book =>{
         
         if (book.creator._id === context.userId) {
             
             return (
-            <div key={book._id}>
-                <h1>{book.title}</h1>
-                <RenderComents bookId={book._id}/>
+            <div key={book._id} className="content-wrapper">
+                <NavLink to={book._id}>
+                    <h1>{book.title}</h1>
+                        {book.question}
+                </NavLink>
             </div>
             )
         }
         return null;
     });
 }
+//#endregion
 
+//#region Functions for Coments of user
+function RenderBooksComents({bookId}){
+    const books = useContext(DataBooks);
 
+    return books.map(book =>{
+        if (book._id === bookId) {
+            return <h1 className="books" key={book._id}>{book.title}</h1>
+        }
+        return null;
+    })
 
+}
+
+function RenderComents(){
+    const coments = useContext(DataComents);
+    const context = useContext(authContext);
+
+    return coments.map(coment =>{
+        if (coment.creatorId._id === context.userId) {
+            
+            return (
+            <div key={coment._id} className="content-wrapper">
+                <NavLink to={coment.bookId._id} >
+                    <RenderBooksComents bookId={coment.bookId._id}/>
+                    <p className="coments">{coment.coment}</p>
+                </NavLink>
+            </div>
+            )
+        }
+        return null;
+    })
+}
+//#endregion
 
 
 
 
 
 const HomePage = () => {
+    const coments = fetchData("coments");
+    const books = fetchData("books");
+
     return(
-        <div>
-            <RenderBooks></RenderBooks>
-        </div>
+        <DataComents.Provider value={coments}>
+            <DataBooks.Provider value={books}>
+                <div className="homePage-wrap">
+                        <div className="your-books-container">
+                            <h1>Your questions</h1>
+                            <RenderBooks className = "render-books"/>
+                        </div>
+                        <div className="your-coments-container">
+                            <h1>Your coments</h1>
+                            <RenderComents/>
+                        </div>
+                </div>
+            </DataBooks.Provider>
+        </DataComents.Provider>
     );
 }
 

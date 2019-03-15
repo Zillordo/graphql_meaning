@@ -5,12 +5,14 @@ type Book {
     _id: ID!
     title: String!
     author: String!
+    question: String!
     creator: User!
 }
 type User {
     _id: ID!
     email: String!
-    password: String
+    password: String!
+    userName: String!
     createdBooks: [Book!]
 }
 type Coment {
@@ -37,10 +39,12 @@ input ComentInput {
 input BookInput {
     title: String!
     author: String!
+    question: String!
 }
 input UserInput {
     email: String!
     password: String!
+    userName: String!
 }
 
 

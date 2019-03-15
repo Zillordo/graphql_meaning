@@ -17,6 +17,7 @@ class BooksPage extends Component{
         super(props);
         this.titleEl = React.createRef();
         this.authEl = React.createRef();
+        this.questionEl = React.createRef();
     };
 
 
@@ -34,18 +35,19 @@ class BooksPage extends Component{
 
         const title = this.titleEl.current.value;
         const author = this.authEl.current.value;
-
+        const question = this.questionEl.current.value;
+        
         if (title.trim().length === 0 || author.trim().length === 0) {
             return console.log("err at triming title, author");
         }
 
         // const book = { title, author}
-
+        
         const requestBody = {
                 query: `
                 mutation{
                     createBook(bookInput:
-                        {title:"${title}", author:"${author}"})
+                        {title:"${title}", author:"${author}", question:"${question.replace(/(?:\r\n|\r|\n)/g, '')}"})
                             {
                                 _id
                                 title
@@ -96,6 +98,7 @@ class BooksPage extends Component{
                     _id
                     title
                     author
+                    question
                     creator {
                         _id
                         email
@@ -129,8 +132,7 @@ class BooksPage extends Component{
     render(){
         
         const booksList = this.state.books.map(book =>{
-            
-            return <NavLink to={book._id} key={book._id}> <li  className="book-item__list">{book.title}</li></NavLink>
+            return <NavLink to={book._id} key={book._id}> <li  className="book-item__list"><h1>{book.title}:</h1> {book.question}</li></NavLink>
         });
 
 
@@ -140,7 +142,7 @@ class BooksPage extends Component{
                     {this.state.toggle && 
                     <React.Fragment>
                         <Backdrop/>
-                            <Modal title="Add Book" canCancle canAdd onCancel={this.cancelHandeler} onAdd={this.addHandeler}>
+                            <Modal title="Add question" canCancle canAdd onCancel={this.cancelHandeler} onAdd={this.addHandeler}>
                                 <form>
                                     <div className="form-control">
                                         <label htmlFor="title">Title:</label>
@@ -150,11 +152,18 @@ class BooksPage extends Component{
                                         <label htmlFor="author">Author:</label>
                                         <input type="text" id="author" ref={this.authEl}></input>
                                     </div>
+                                    <div className="form-control">
+                                        <label htmlFor="question">Question:</label>
+                                        <textarea type="text" id="question" ref={this.questionEl}></textarea>
+                                    </div>
                                 </form>
                             </Modal>  
                     </React.Fragment>
                     }
-                    {this.context.token && <button className="add-new-book-butn" onClick={this.addNewBookToggle}>Add new book</button>}
+                    {this.context.token && <div className="new-book-butn-container">
+                        <label htmlFor="new-button">Ask question about any book</label>
+                        <button id="new-button" className="add-new-book-butn" onClick={this.addNewBookToggle}>Create question</button>
+                    </div>}
                     <ul className="books__list">
                         {booksList}
                     </ul>

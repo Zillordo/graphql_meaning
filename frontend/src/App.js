@@ -17,14 +17,31 @@ class App extends Component {
   }
 
   login = (token, userId, tokenExpiration) => {
-    this.setState({ token: token, userId: userId })
+    localStorage.setItem('token', JSON.stringify(token));
+    localStorage.setItem('userId', JSON.stringify(userId));
+    this.retriveToken();
   }
+
+  
 
   logout = () => {
     this.setState({token: null, userId: null})
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+  }
+
+  retriveToken(){
+      const token = JSON.parse(localStorage.getItem('token'));;
+      const userId = JSON.parse(localStorage.getItem('userId'));
+      this.setState({token: token, userId: userId});
   }
 
   render() {
+
+    window.onload = () =>{
+      this.retriveToken();
+    }
+
     return (
       <BrowserRouter>
         <React.Fragment>
@@ -38,12 +55,11 @@ class App extends Component {
             <MainNavigation />
             <main className="main-content">
               <Switch>
-                {this.state.token && <Redirect from="/" to="/books" exact />}
                 {!this.state.token && <Redirect from="/" to="/books" exact />}
-                {!this.state.token && <Redirect from="/home" to="books" exact />}
                 {this.state.token && <Redirect from="/auth" to="/home" exact/>}
                 {this.state.token && (<Route path="/home" component={HomePage} />)}
                 {!this.state.token && (<Route path="/auth" component={AuthPage} />)}
+                {!this.state.token && <Redirect from="/home" to="books" exact />}
                 <Route path="/books" component={BooksPage} />
                 <Route path="/:id" component={BookItem} exact/>
               </Switch>

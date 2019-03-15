@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
-import AuthContext from '../context/auth-context';
+
+import authContext from '../context/auth-context';
 
 
 
@@ -11,7 +12,7 @@ class BookItem extends Component {
         coment: []
     }
 
-    static contextType = AuthContext;
+    static contextType = authContext;
 
     constructor(props){
         super(props)
@@ -27,8 +28,11 @@ class BookItem extends Component {
     addHandeler = () =>{
 
         const coment = this.comentEl.current.value;
+        const token = this.context.token;
         
-
+        if (!token) {
+            window.alert("Pleas log-in first");
+        }
         if (coment.trim().length === 0) {
             return console.log("err at triming coment");
         }
@@ -36,14 +40,13 @@ class BookItem extends Component {
         const requestBody = {
                 query: `
                     mutation {
-                            createComent(comentInput: {coment: "${coment}", bookId: "${this.state.bookId}"}) {
+                            createComent(comentInput: {coment: "${coment.replace(/(?:\r\n|\r|\n)/g, '')}", bookId: "${this.state.bookId}"}) {
                                 _id
                             }
                         }
                 `
             };
 
-            const token = this.context.token;
 
         fetch('http://localhost:8000/graphql', {
             method: 'POST',
@@ -76,6 +79,7 @@ class BookItem extends Component {
                     coment
                     creatorId {
                         email
+                        userName
                     }
                     bookId {
                         _id
@@ -114,9 +118,10 @@ class BookItem extends Component {
                     _id
                     title
                     author
+                    question
                     creator {
                         _id
-                        email
+                        userName
                     }
                 }
                 }
@@ -145,7 +150,8 @@ class BookItem extends Component {
                         const objbook = {
                             title: book.title,
                             author: book.author,
-                            user: book.creator.email,
+                            question: book.question,
+                            user: book.creator.userName,
                         }
                         return this.setState({books: objbook});
                     }
@@ -161,10 +167,16 @@ class BookItem extends Component {
             const title = this.state.books.title;
             const author = this.state.books.author;
             const user = this.state.books.user;
+            const question = this.state.books.question;
 
             const coment = this.state.coment.map(com =>{
                 if (com.bookId._id === this.state.bookId) {
-                    return <div key={com._id} className="coment">{com.coment}</div>
+                    return( 
+                    <div key={com._id} className="coment">
+                    <sup>{com.creatorId.userName}:</sup>
+                    <p>{com.coment}</p>
+                    </div>
+                    )
                 }
                 return null;
             })
@@ -178,12 +190,12 @@ class BookItem extends Component {
                             <div className="author"><sub>{author}</sub></div>
                             <div className="question">
                                 <p>{user}´s question: </p>
-                                <p>Question inster here</p>
+                                <p>{question}</p>
                             </div>
                         </div>
                         <div className="coments-container">
                             <div className="create-new-coment">
-                                <textarea ref={this.comentEl}></textarea>
+                                <textarea placeholder="Write a coment" ref={this.comentEl}></textarea>
                                 <button onClick={this.addHandeler}>Add</button>
                             </div>
                             {coment}

@@ -27,6 +27,7 @@ module.exports = {
         const book = new Book({
             title: args.bookInput.title,
             author: args.bookInput.author,
+            question: args.bookInput.question,
             creator: req.userId
         });
 
