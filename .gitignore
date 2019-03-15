@@ -1,3 +1,4 @@
 
 nodemon.json
 *.json
+node_modules
