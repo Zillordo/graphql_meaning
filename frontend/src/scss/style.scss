@@ -3,6 +3,7 @@ $blue: #98dafc;
 $brown: #daad86;
 $dark-brown: #312c32;
 $gray: #DAE0E6;
+$darker-gray: rgba(0, 0, 0, 0.568);
 
 
 .main-content{
@@ -311,8 +312,21 @@ $gray: #DAE0E6;
                 margin: 8px;
                 border-left: 3px solid gray;
                 white-space: wrap;
+                display: flex;
+                flex-flow: column;
                 p{
                     margin: 0;
+                }
+                .coment-button{
+                    border: none;
+                    background-color: inherit;
+                    float: right;
+                    color: $darker-gray;
+                    width: 30px;
+                    margin-top: 10px;
+                    &:hover{
+                        color: rgba(0, 0, 0, 0.89);
+                    }
                 }
             }
             .create-new-coment{

@@ -80,6 +80,7 @@ class BookItem extends Component {
                     creatorId {
                         email
                         userName
+                        _id
                     }
                     bookId {
                         _id
@@ -161,6 +162,63 @@ class BookItem extends Component {
             .catch(err => console.log(err))
     };
 
+    deleteComent = (comentId) =>{ 
+        
+        const token = this.context.token;
+        if (!token) {
+            window.alert("Pleas log-in first");
+        }
+
+        const requestBody = {
+                query: `
+                mutation {
+                    deleteComent(comentId: "${comentId}") {
+                    _id
+                    }
+                }
+                `
+            };
+
+
+        fetch('http://localhost:8000/graphql', {
+            method: 'POST',
+            body: JSON.stringify(requestBody),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .then(res =>{
+            if (res.status !== 200 && res.status !== 201) {
+                throw new Error('res.status == 200 || 201 "Faild!"');
+            }
+            return res.json();
+
+        })
+        .then(resData => {
+            this.getComents();
+        })
+        .catch(err => console.log(err))
+    }
+
+    renderComents(){
+        const user = this.context.userId;
+
+        const coment = this.state.coment.map(com =>{
+
+            if (com.bookId._id === this.state.bookId) {
+                    return(
+                        <div key={com._id} className="coment">
+                            <sup>{com.creatorId.userName}:</sup>
+                            <p>{com.coment}</p>
+                            {user === com.creatorId._id && <button onClick={() => {this.deleteComent(com._id)}} className="coment-button">Delete</button>}
+                        </div>
+                    )
+            }
+            return null;
+        })
+        return coment;
+    }
 
 
     render() {
@@ -169,17 +227,6 @@ class BookItem extends Component {
             const user = this.state.books.user;
             const question = this.state.books.question;
 
-            const coment = this.state.coment.map(com =>{
-                if (com.bookId._id === this.state.bookId) {
-                    return( 
-                    <div key={com._id} className="coment">
-                    <sup>{com.creatorId.userName}:</sup>
-                    <p>{com.coment}</p>
-                    </div>
-                    )
-                }
-                return null;
-            })
 
         return (
             <React.Fragment>
@@ -198,7 +245,7 @@ class BookItem extends Component {
                                 <textarea placeholder="Write a coment" ref={this.comentEl}></textarea>
                                 <button onClick={this.addHandeler}>Add</button>
                             </div>
-                            {coment}
+                            {this.renderComents()}
                         </div>
                     </div>
                 </div>
