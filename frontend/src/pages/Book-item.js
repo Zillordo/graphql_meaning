@@ -165,6 +165,7 @@ class BookItem extends Component {
     deleteComent = (comentId) =>{ 
         
         const token = this.context.token;
+
         if (!token) {
             window.alert("Pleas log-in first");
         }
@@ -207,13 +208,13 @@ class BookItem extends Component {
         const coment = this.state.coment.map(com =>{
 
             if (com.bookId._id === this.state.bookId) {
-                    return(
-                        <div key={com._id} className="coment">
-                            <sup>{com.creatorId.userName}:</sup>
-                            <p>{com.coment}</p>
-                            {user === com.creatorId._id && <button onClick={() => {this.deleteComent(com._id)}} className="coment-button">Delete</button>}
-                        </div>
-                    )
+                return(
+                    <div key={com._id} className="coment">
+                        <sup>{com.creatorId.userName}:</sup>
+                        <p>{com.coment}</p>
+                        {user === com.creatorId._id && <button onClick={() => {this.deleteComent(com._id)}} className="coment-button">Delete</button>}
+                    </div>
+                )
             }
             return null;
         })
@@ -243,7 +244,7 @@ class BookItem extends Component {
                         <div className="coments-container">
                             <div className="create-new-coment">
                                 <textarea placeholder="Write a coment" ref={this.comentEl}></textarea>
-                                <button onClick={this.addHandeler}>Add</button>
+                                {this.context.token && <button onClick={this.addHandeler}>Add</button>}
                             </div>
                             {this.renderComents()}
                         </div>
